@@ -6,8 +6,8 @@ Gaussian Process Regression (GPR) was developed in 1995 as a machine learning me
 
 ## Problem
 The problem is twofold.
-1. GPR is still a heavy computational lift even with a GPU. Plus, we're dealing with a massive dataset (multi-beam sonar data is dense). Can we make GPR faster?
-2. Not all sonar data is created equal. The physics that govern underwater waves cause the outer beams to be less accurate than inner beams. Can we include a physics model to more accurately represent sonar data in GPR?
+1. GPR is still a heavy computational lift even with a GPU under Krasnosky's approach. Plus, we're dealing with a massive dataset (multi-beam sonar data is dense). Can we make GPR faster?
+2. Not all sonar data is created equal. The physics that govern underwater acoustic waves cause the outer beams to be less accurate than inner beams. Can we include a physics model to more accurately represent sonar data in GPR?
 
 ## Approach
 For each problem there is an approach to solving it.
@@ -20,7 +20,7 @@ This Ocean Engineering MS Thesis is built and tuned for multi-beam sonar data. T
 With that being said, the approaches used here can be generalized to other research in the environmental variable modeling domain. 
 
 ## Results
-Results will be presented in my MS thesis and in a publications that I will link at a later date (~June 2023).
+Results will be presented in my MS thesis and in a publication that I will link at a later date (~June 2023).
 
 ## Acknowledgements
 Shoutout to the original researchers who developed GPR, to Kris Krasnosky for bringing it into the modern era and to URI, and to Chris Roman for advising me on this project. 
