@@ -1,4 +1,4 @@
-# gpr-ms-thesis
+# gpr_ms_thesis
 MS Thesis scripts from my time at University of Rhode Island
 
 ## Background
