@@ -1,65 +1,122 @@
 %%% GPR in MATLAB // URI Phillip Parisi - Updated May 3, 2022
-%%% Approach from Dr. Kristopher Krasnosky
-
-%%% Version Control Notes
-% Working with approximate methods now
-% Added in Cholesky option to calcGPR()
 
 %%% How to use this code
-% 1. either load a saved dataset OR calculate new dataset
-% 2. run GPR section
+% 1. add function path
+% 2. load data
+% 2. run standard GPR (no downsampling)
+
+clc, clear all, close all, format compact
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Add File Paths
+dir_path = cd;
+idcs = strfind(dir_path,'/');
+main_dir = dir_path(1:idcs(end));
+func_dir = [strcat(main_dir,"gpr_functions"), strcat(main_dir,"other_functions")];
+addpath(func_dir(1)), addpath(func_dir(2))
 
 
-%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOAD Random Training Dataset
-clc, clear all, close all, format compact
-addpath("gpr_functions/")
 
-%load("~/Data/approx_methods_datasets/matlab_gpr_datasets/A_random_training_data_gpr_40.mat")
-load("~/Data/approx_methods_datasets/matlab_gpr_datasets/B_random_training_data_gpr_5000.mat")
-nnum = length(X);
+% Load Single Ping Data
+ping_filename = "wiggles_single_ping.csv";
+data = readtable(strcat(main_dir,"/data/",ping_filename));
+training.x = table2array(data(:,1));
+training.y = table2array(data(:,2));
+training.z = table2array(data(:,3));
 
-% Create a Downsampled Dataset N -> M
-b = 10; % keep every jth point
-[X_d,Y_d] = rawDownsample(X,Y,b);
+training.x = training.x - mean(training.x); % de-mean x
+training.y = training.y - mean(training.y); % de-mean y
+training.z = training.z - mean(training.z); % de-mean z
+training.npts = length(training.x);
 
-disp(strcat("...training data with ", num2str(nnum), " datapoints loaded..."))
-disp(strcat("...downsampled: kept every 1 in ", num2str(b), " points..."))
-clearvars -except nnum X Y X_d Y_d
+
+disp(strcat("...training data with ", num2str(training.npts), " datapoints loaded..."))
+
+% if you want new random data, scroll to bottom of this script
 
 %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEW Random Training Dataset
-clc, clear all, close all, format compact
-
-% Training Data + Noise
-nnum = 5000; 
-X_beg = -nnum; X_end = nnum;                        
-X = (X_end - X_beg)*rand(nnum,1) + X_beg;           % vertical array, training X, uniform random
-X = sort(X);                                        % put in ascending order
-
-Y = 3*sin(2*pi/40*X) + (rand(nnum,1)*1 - 0.5);      % vertical array, training Y, sinusoidal + noise
-
-% Create a Downsampled Dataset N -> M
-b = 2; % keep every jth point
-[X_d,Y_d] = rawDownsample(X,Y,b);
-
-disp(strcat("...new training data generated with ",num2str(nnum)," points..."))
-disp(strcat("...downsampled: kept every 1 in ", num2str(b), " points..."))
-clearvars -except nnum X Y X_d Y_d
-
-%% RUN GPR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RUN GPR on the Data
 close all
-disp('...runnning GPR...')
+disp('...runnning GPR...'), tic
 
-%%%%%% Execute GPR
-% Use either cholesky decomp -->    calcGPR_chol()
-% or regular inverse with inv() --> calcGPR()
-GPR = calcGPR(X,Y,nnum,'chol');
-GPR_d = calcGPR(X_d,Y_d,nnum,'chol');
-disp('...finished GPR!...')
+X = training.x; Y = training.z; nnum = training.npts;
+X_beg = X(1); X_end = X(end);
+%%%%%%% Matric Calculations
 
+% Kernel Hyperparameters [not optimized/trained] & Noise
+hp.L = 0.3;                  % lengthscale (high = smoother, low = noisier)
+hp.sigma_p = 0.23;            % process noise (aka vertical scale, output scale)
+hp.sigma_n = 0.04;            % sensor noise (used to create W)
+hp.kerneltype = 'exact';     % 'exact' or 'sparse' approximate kernel
+
+
+% Prediction Points (X_Star)
+X_Star = [[(-1+X_beg):.02:(1+X_end)]'; X];            % vertical array, add training data for prediction X
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MATRIX CALCS
+
+% Calculate V and Inv(V)                     % depends on training x-points only
+W = (hp.sigma_n^2)*eye(nnum);                % Whitenoise (identity * sigmasquared)
+V = K_Function(X,X,hp) + W;                  % Calculate Covariance Matrix using Kernel
+
+% Generate K Parameters
+K_Star = K_Function(X_Star,X,hp);            % Calculate K_Star for New Point(s)
+K_StarStar = K_Function(X_Star,X_Star,hp);   % Calculate K_StarStar for New Point(s)
+
+% Cholesky Decomposition
+L = chol(V,'lower');                         % Lower triangular cholesky factor
+
+% Calculate Predictions!                                    % Finally bring in the training y-points here
+Y_Star_Hat = K_Star * CholeskySolve(L,Y);                   % Mean Predictions (mean of Gaussians)
+CapSigma_Star = K_StarStar-K_Star*CholeskySolve(L,K_Star'); % Variance Predictions (prediction covariance matrix)
+Y_Star_Var = diag(CapSigma_Star);                           % The diagonals store the variances we want!
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOG MARGINAL LIKELIHOOD
+
+% How good is our fit? Use this to tune hyperparameters
+LML = calcLML(L,Y,nnum);
+AlgoTime = toc;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTS & OUTPUTS
+
+% Output LML
+fprintf('AlgoTime = %1.2f.\n',AlgoTime)
+fprintf('Log Marginal Likelihood is %1.1f. Tune hyperparams for better fit.\n',LML)
+
+%%% Plot GPR
+% Organize Data to Plot It (created new obj
+sortobj = [X_Star, Y_Star_Hat, Y_Star_Var];
+sortobj = sortrows(sortobj);
+sorted.X_Star = sortobj(:,1); sorted.Y_Star_Hat = sortobj(:,2); sorted.Y_Star_Var = sortobj(:,3);
+
+% Bounded Plot (Training Data + Predictions + 2sigma Upper and Lower Bound
+figure
+p1 = plot(sorted.X_Star,sorted.Y_Star_Hat + 2*sqrt(sorted.Y_Star_Var),'r','LineWidth',2); hold on %upper bound
+plot(sorted.X_Star,sorted.Y_Star_Hat - 2*sqrt(sorted.Y_Star_Var),'r','LineWidth',2); % lower bound
+p2 = plot(sorted.X_Star,sorted.Y_Star_Hat,'r--','Linewidth',2); % prediction means
+p3 = plot(X,Y,'bo','MarkerFaceColor','b','MarkerSize',3); % training data
+xlabel('Position on Seafloor'), ylabel('Depth'), title('Gaussian Process Regression')
+grid on, legend([p3 p2 p1],"Training Data","Prediction \mu","Prediction 2\sigma")
+
+axis equal
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%
 %%%%%% Calculate Metrics
-% each method against TRAINING DATA? GRIDDED PRODUCT?
 
 %%% Sum of Squared Differences - between exact and approx
 Metrics.SSD = sum((GPR.Y_Star_Hat - GPR_d.Y_Star_Hat).^2);
@@ -99,6 +156,9 @@ xlabel('X Values'), ylabel('Y Values')
 legend('Predicted', 'Uncertainty','Raw Data')
 title(GPR_d.title_str)
 
+
+
+
 %% Data from Speed Trials [Figure Code]
 %clc, close all 
 
@@ -126,3 +186,25 @@ set(gca,'xdir','rev')
 title('Comparing Different Raw Downsampled points, Exact had 5000pts')
 xlabel('Downsampled dpts')
 legend('Inverse','w/ Cholesky')
+
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEW Random Training Dataset
+clc, clear all, close all, format compact
+
+% Training Data + Noise
+nnum = 5000; 
+X_beg = -nnum; X_end = nnum;                        
+X = (X_end - X_beg)*rand(nnum,1) + X_beg;           % vertical array, training X, uniform random
+X = sort(X);                                        % put in ascending order
+
+Y = 3*sin(2*pi/40*X) + (rand(nnum,1)*1 - 0.5);      % vertical array, training Y, sinusoidal + noise
+
+% Create a Downsampled Dataset N -> M
+b = 2; % keep every jth point
+[X_d,Y_d] = rawDownsample(X,Y,b);
+
+disp(strcat("...new training data generated with ",num2str(nnum)," points..."))
+disp(strcat("...downsampled: kept every 1 in ", num2str(b), " points..."))
+clearvars -except nnum X Y X_d Y_d

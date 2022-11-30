@@ -13,7 +13,7 @@ clc, clear GPR_d hp metrics nnum X X_d Y Y_d, close all, format compact
     % if below code does not work
 dir_path = cd;
 idcs = strfind(dir_path,'/');
-func_dir = dir_path(1:idcs(end-1));
+func_dir = dir_path(1:idcs(end));
 func_dir = strcat(func_dir,"gpr_functions");
 addpath(func_dir);
 
