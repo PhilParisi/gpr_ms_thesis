@@ -44,10 +44,10 @@ X_beg = X(1); X_end = X(end);
 %%%%%%% Matric Calculations
 
 % Kernel Hyperparameters [not optimized/trained] & Noise
-hp.L = 0.3;                  % lengthscale (high = smoother, low = noisier)
-hp.sigma_p = 0.23;            % process noise (aka vertical scale, output scale)
+hp.L = 7;                  % lengthscale (high = smoother, low = noisier)
+hp.sigma_p = 0.1;            % process noise (aka vertical scale, output scale)
 hp.sigma_n = 0.04;            % sensor noise (used to create W)
-hp.kerneltype = 'exact';     % 'exact' or 'sparse' approximate kernel
+hp.kerneltype = 'sparse';     % 'exact' or 'sparse' approximate kernel
 
 
 % Prediction Points (X_Star)
@@ -101,7 +101,7 @@ p3 = plot(X,Y,'bo','MarkerFaceColor','b','MarkerSize',3); % training data
 xlabel('Position on Seafloor'), ylabel('Depth'), title('Gaussian Process Regression')
 grid on, legend([p3 p2 p1],"Training Data","Prediction \mu","Prediction 2\sigma")
 
-axis equal
+%axis equal
 
 
 

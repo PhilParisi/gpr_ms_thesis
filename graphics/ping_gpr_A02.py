@@ -78,7 +78,7 @@ model.predict_y(Xnew)
 
 
 # Confidence Bounds
-Xplot = np.linspace(np.round((x_data[0, 0]*1.05),1), np.round(x_data[x_data.size-1,0]*1.05,1), x_data.size*3)[:, None]
+Xplot = np.linspace(np.round((x_data[0, 0]*1.05),1), np.round(x_data[x_data.size-1,0]*1.05,1), x_data.size*6)[:, None]
 f_mean, f_var = model.predict_f(Xplot, full_cov=False)
 y_mean, y_var = model.predict_y(Xplot)
 f_lower = f_mean - 1.96 * np.sqrt(f_var)
@@ -88,17 +88,18 @@ y_upper = y_mean + 1.96 * np.sqrt(y_var)
 
 
 plt.plot(X, Y, "kx", mew=2, label="input data")
-plt.plot(Xplot, f_mean, "-", color="C0", label="mean")
+plt.plot(Xplot, f_mean, "-", color="C0", label="GPR")
+plt.plot(X, Y, "--r", label="interpolated")
 #plt.plot(Xplot, f_lower, "--", color="C0", label="f 95% confidence")
 #plt.plot(Xplot, f_upper, "--", color="C0")
 #plt.fill_between(
 #    Xplot[:, 0], f_lower[:, 0], f_upper[:, 0], color="C0", alpha=0.1
 #)
-plt.plot(Xplot, y_lower, "--", color="C0", label="Y 95% confidence")
-plt.plot(Xplot, y_upper, "--", color="C0")
-plt.fill_between(
-    Xplot[:, 0], y_lower[:, 0], y_upper[:, 0], color="C0", alpha=0.2
-)
+#plt.plot(Xplot, y_lower, "--", color="C0", label="Y 95% confidence")
+#plt.plot(Xplot, y_upper, "--", color="C0")
+#plt.fill_between(
+#    Xplot[:, 0], y_lower[:, 0], y_upper[:, 0], color="C0", alpha=0.2
+#)
 plt.legend()
 plt.ylabel('Depth (meters)')
 plt.xlabel('Distance along Seafloor (meters)')

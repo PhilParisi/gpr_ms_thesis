@@ -100,8 +100,8 @@ plt.fill_between(
     Xplot[:, 0], y_lower[:, 0], y_upper[:, 0], color="C0", alpha=0.2
 )
 plt.legend()
-plt.ylabel('Depth (meters)')
-plt.xlabel('Distance along Seafloor (meters)')
+plt.ylabel('Depth (z)')
+plt.xlabel('Distance along Seafloor (x)')
 
 gpflow.utilities.print_summary(model)
 
