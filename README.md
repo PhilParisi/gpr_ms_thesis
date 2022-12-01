@@ -23,4 +23,26 @@ With that being said, the approaches used here can be generalized to other resea
 Results will be presented in my MS thesis and in a publication that I will link at a later date (~June 2023).
 
 ## Acknowledgements
-Shoutout to the original researchers who developed GPR, to Kris Krasnosky for bringing it into the modern era and to URI, and to Chris Roman for advising me on this project. 
+Shoutout to the original researchers who developed GPR, to Kris Krasnosky for bringing it into the modern era and to URI, and to Chris Roman for advising me on this project. Big thank you to the developers over at GPflow https://www.gpflow.org/.
+
+# Using this Code
+The file breadown is as follows:
+1. approx_gpr --> stores scripts related to approximation to GPR, mostly different downsampling methodologies
+2. data --> the scripts in this repository depends on data in this folder
+3. gpr_functions --> functions needed by other scripts sepcificially invovled in the GPR calculations
+4. graphics --> images, plots, and figures created for posters and papers along with the scripts that generated the plots
+5. other_functions --> all other general functions that are not GPR-specific
+6. python --> any python scripts are stored here, specifically those used when working with GPflow
+7. standard_gpr --> the oppose of approx_gpr, these are the most basic examples of running GPR and are a great place to start
+
+
+## MATLAB Scripts
+The MATLAB code pretty much runs itself. They depend on function .m files found in 'gpr_functions' and 'other_functions' folders. You may need a toolbox here or there, but it's mostly standard functions being used. All the extra function you need are stored
+
+## Python Scripts
+Python scripts may run out of the box with basic package installation, but anything with GPflow will require special installations. Follow the GPflow instructions for install here https://gpflow.github.io/GPflow/develop/installation.html.
+
+# Gaussian Process Regression Notes
+
+## Kernels
+Two kernels were looked at in this research: the common squared exponential kernel and the sparse (approximate) squared exponential kernel. These are stored in gpr_functions/SqExpKernel.m and gpr_functions/SqExpKernelSparse.m respectively. 
