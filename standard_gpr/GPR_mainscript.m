@@ -9,7 +9,7 @@ clc, clear all, close all, format compact
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Add File Paths
 dir_path = cd;
-idcs = strfind(dir_path,'/');
+idcs = strfind(dir_path,'\');
 main_dir = dir_path(1:idcs(end));
 func_dir = [strcat(main_dir,"gpr_functions"), strcat(main_dir,"other_functions")];
 addpath(func_dir(1)), addpath(func_dir(2))
@@ -31,7 +31,7 @@ training.npts = length(training.x);
 
 
 disp(strcat("...training data with ", num2str(training.npts), " datapoints loaded..."))
-
+disp('...run next section to continue...');
 % if you want new random data, scroll to bottom of this script
 
 %%

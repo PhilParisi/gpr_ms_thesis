@@ -19,20 +19,14 @@ clc
 addpath("..\..\gpr_functions\")
 
 %%
-%%%%%%%%% Bring in Raw Data
+% Bring in ping data
 clc, clear all, close all, format compact, %close all
 
-%load("../../data/approx_methods_datasets/matlab_gpr_datasets/A_random_training_data_gpr_40.mat")
-%load("~/Data/approx_methods_datasets/matlab_gpr_datasets/B_random_training_data_gpr_5000.mat")
-%nnum = length(X);
-%addpath("..\..\data")
-%load("..\..\data\wiggles_sample_ping.csv")
 data = readtable("wiggles_single_ping.csv");
 
-%disp(strcat("...training data with ", num2str(nnum), " datapoints loaded..."))
-%clearvars -except nnum X Y
-
-X = data.X; Y = data.Z; nnum = length(X);
+X = data.X; % inputs are only the x-direction (should update to x and y)
+Y = data.Z; % outputs are the vertical depth
+nnum = length(X);
 
 figure(1), plot(X,Y,'b.','markersize',5)
 
@@ -42,7 +36,7 @@ clc, clearvars -except nnum X Y, close all
 %Downsampling as Described in Paper
 
 % total points wanted in slim data [threshold for ending algo]
-totalpts_slimdata = round(0.2*nnum);
+totalpts_slimdata = round(0.25*nnum);
 
 %%%%%%%%%  Hyperparamters
 hp.L = 10;
@@ -183,7 +177,7 @@ end
 % end the while loop, should have a final active set I
 
 
-%%%%%%%%%%  CREATE PLOTS
+%%%%%%%%%%  CREATE PLOT of Chosen Points
 close all
 
 % Plot 1: Training DataPoints
@@ -191,63 +185,21 @@ close all
  % Show pts in R (remaining)
 
 f1 = figure;
+
+% inclusion points
 plot(X(I),Y(I),'bo','markerfacecolor','b'), hold on
-plot(X(R),Y(R),'ko'), hold off, grid on
+
+% rest of input points (exluded)
+plot(X(R),Y(R),'k.','markersize',5), hold off, grid on
 xlabel('Training Data X Values'),ylabel('Training Data Y Values')
-legend('Slim Data','Excess Raw Data')
+legend('Inclusion Set','Excess Points')
 title_str = strcat("Approx GPR on Slim Data (", ...
     num2str(length(X)),"raw to ", ...
     num2str(length(I)),"slim)");
 title(title_str), grid on
 %f.WindowState = 'maximized'; %make it full screen
 
+disp(nnum)
+disp(length(I))
 
-
-
-
-%%
-
-%%%%% PREDICTIONS!
-f2 = figure;
-plot(X(I),Y(I),'bo','markerfacecolor','b'), hold on
-xlabel('Training Data X Values'),ylabel('Training Data Y Values')
-
-% k prediction points
-X_beg = -nnum; X_end = nnum; 
-X_Star = [(-15+X_beg):.2:(15+X_end)];
-
-for k = 1:length(X_Star)
-
-    l_star = inv(L)*(K_Function(X_Star(k),X(I),hp))';
-    l_Mstar = inv(L_M)*l_star;
-
-    Y_mu_star(k) = l_Mstar'*Beta;
-    Y_sigmasq_star(k) = K_Function(X_Star(k), X_Star(k), hp) + ...
-        - norm(l_star)^2 + ...
-        hp.sigma_p^2*norm(l_Mstar)^2;
-end
-% 
-% errorbar(X_star,Y_mu_star,Y_sigmasq_star,'ro')
-% legend('Slim Data','Prediction \mu and \sigma')
-% title_str = strcat("Approx GPR on Slim Data (", ...
-%     num2str(length(X)),"raw to ", ...
-%     num2str(length(I)),"slim)");
-% title(title_str), grid on
-
-Y_Star_Hat = Y_mu_star;
-Y_Star_Var = Y_sigmasq_star;
-
-sortobj = [X_Star', Y_Star_Hat', Y_Star_Var'];
-sortobj = sortrows(sortobj);
-sorted.X_Star = sortobj(:,1); sorted.Y_Star_Hat = sortobj(:,2); sorted.Y_Star_Var = sortobj(:,3);
-
-
-f3 = figure;
-p1 = plot(sorted.X_Star,sorted.Y_Star_Hat + 2*sqrt(sorted.Y_Star_Var),'r','LineWidth',2); hold on %upper bound
-plot(sorted.X_Star,sorted.Y_Star_Hat - 2*sqrt(sorted.Y_Star_Var),'r','LineWidth',2); % lower bound
-p2 = plot(sorted.X_Star,sorted.Y_Star_Hat,'r--','Linewidth',2); % prediction means
-p3 = plot(X(I),Y(I),'bo','markerfacecolor','b'); % pts in I
-p4 = plot(X(R),Y(R),'ko'); % pts in R
-xlabel('X Values'), ylabel('Y Values'), title('Gaussian Process Regression')
-grid on, legend([p3 p4 p2 p1],"Slim Data","Excess Raw Pts","Prediction \mu","Prediction 2\sigma")
 
