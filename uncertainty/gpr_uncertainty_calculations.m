@@ -1,5 +1,5 @@
 % Uncertainty calculations for a given ping
-clc, clearvars, close all
+clc, clearvars, close all, format compact
 
 % Parameters
 r = 10;

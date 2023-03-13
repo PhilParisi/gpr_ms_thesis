@@ -16,7 +16,13 @@
 
 %%
 clc
-addpath("..\..\gpr_functions\")
+if ispc()
+    addpath("..\..\gpr_functions\")
+else
+    addpath("../../gpr_functions/")
+end
+
+
 
 %%
 %%%%%%%%% Bring in Raw Data
