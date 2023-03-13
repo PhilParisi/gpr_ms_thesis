@@ -65,7 +65,7 @@ for i = 1:p:height(data)        % loop over all points
 end
 
 
-% info gain
+% dissimilar neighbor
 % go over every point
 for i = 1:height(data)
 
@@ -175,12 +175,12 @@ grid on
 subplot(3,2,5)
 plot(data.Y, data.Z, 'k.'), hold on
 plot(infogain_pts.Y, infogain_pts.Z,'bv','MarkerFaceColor','b')
-title('Information Gain Inclusions'), xlabel('Position (m)'), ylabel('Depth (m)')
+title('Dissimilar Neighbor Inclusions'), xlabel('Position (m)'), ylabel('Depth (m)')
 grid on
 
 % raw and kmeans
 subplot(3,2,6)
 plot(data.Y, data.Z, 'k.'), hold on
 plot(C(:,1),C(:,2),'>','Color',[1 0.5 0], 'MarkerFaceColor', [1 0.5 0])
-title('Kmeans Inclusions'), xlabel('Position (m)'), ylabel('Depth (m)')
+title('K-means Inclusions'), xlabel('Position (m)'), ylabel('Depth (m)')
 grid on
