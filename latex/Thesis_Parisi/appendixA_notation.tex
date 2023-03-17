@@ -1,0 +1,50 @@
+\chapter{Notation and GPR Equations} 
+
+The following variables and parameters are present in GPR equations. Bold symbols indicate matrix quantities, standard roman characters indicate scalar values. 
+\begin{itemize}[noitemsep, nolistsep]
+    \item $D$ is the set of training data, consisting of input vectors mapping to target scalars, which is the input to a GPR model, $D = \{(\boldsymbol{x}_i,y_i)|i=1,\ldots,N\}$
+    \item $N$ is the number of data points in the training data
+    \item $d$ is the number of dimensions of the input $\boldsymbol{x}$ data
+    \item $\boldsymbol{x}$ is a $N \times d$ matrix of input values and the independent variables in the training data, $\boldsymbol{x_i} = [{x}_1, {x}_2, ... , {x}_d]$
+    \item $\boldsymbol{y}$ is a $N \times 1$ matrix of target values and part of the training data
+    \item $f$ is the underlying function of interest that maps $\boldsymbol{x}_i$ to ${y}_i$, such that $y_i = f(\boldsymbol{x}_i) + \epsilon$
+    \item $\epsilon$ is the observation error assumed to be independent identically distributed Gaussian noise with $\mu = 0$, $\epsilon \sim \mathcal{N}(0,\sigma_n^{2})$
+    \item $\sigma_n^2$ is the scalar sensor noise variance
+    \item $\boldsymbol{\sigma_n^2}$ is the sensor noise vector, $\boldsymbol{\sigma_n^2} = [\sigma_1^2, \sigma_2^2, ... , \sigma_N^2]^T$
+    \item $A$ is the number of prediction points for inference
+    \item $\boldsymbol{x}_{\ast}$ is a $A \times d$ matrix of prediction input points for inference
+    \item $\boldsymbol{y}_{\ast}$ is a $A \times 1$ matrix of the solution means of GPR (output prediction points determined by inference with the GPR model using $\boldsymbol{x}_{\ast}$)
+    \item $\boldsymbol{\Sigma}_{\ast}$ is a $A \times A$ output covariance matrix with diagonal values as the solution variances 
+    \item $k(\boldsymbol{x},\boldsymbol{x'})$ is the kernel function used to calculate covariances
+    \item $l$ is the lengthscale present in the kernel function as a hyperparameter
+    \item $\sigma_f^2$ is the process noise (variance) of the underlying function $f$ and is present in the kernel function as a hyperparameter
+    \item $\boldsymbol{\theta}$ is the set of hyperparameters in the kernel function, $\boldsymbol{\theta} = \{l,\sigma_f^2\}$
+    \item $s$ is the downsample percent parameter, $0 \leq s \leq 1$
+    \item $\boldsymbol{K}$ is a $N \times N$ auto-covariance matrix for input points $\boldsymbol{x}$, $\boldsymbol{K} = k(\boldsymbol{x},\boldsymbol{x})$
+    \item $\boldsymbol{K}_{\ast}$ is a $A \times N$ covariance matrix for prediction input points $\boldsymbol{x_{\ast}}$ and input points $\boldsymbol{x}$, $\boldsymbol{K_{\ast}} = k(\boldsymbol{x_{\ast}},\boldsymbol{x})$
+    \item $\boldsymbol{K}_{\ast\ast}$ is a $A \times A$ covariance matrix for prediction input points $\boldsymbol{x}_{\ast}$, $\boldsymbol{K}_{\ast\ast} = k(\boldsymbol{x}_{\ast},\boldsymbol{x}_{\ast})$
+    \item $\boldsymbol{W}$ is a $N \times N$ sensor noise matrix with variances pertaining to each input point. For constant variances, $\boldsymbol{W} = \sigma_n^2 \boldsymbol{I}$. For datapoints with unique variances, $\boldsymbol{W} = diag(\boldsymbol{\sigma_n^2})$.
+    \item $\boldsymbol{I}$ is the identity matrix
+    \item $\boldsymbol{V}$ is a $N \times N$ complete input covariance matrix, $\boldsymbol{V} = \boldsymbol{K} + \boldsymbol{W}$
+\end{itemize}
+
+The equations that govern GPR with a squared exponential kernel are:
+\begin{gather*}
+    k(\boldsymbol{x},\boldsymbol{x'}) = \sigma_f^2 exp(-\frac{|\boldsymbol{x}-\boldsymbol{x'}|^2}{2l^2}) \\
+    \boldsymbol{y}_{\ast} = \boldsymbol{K}_{\ast} \cdot \boldsymbol{V}^{-1} \cdot \boldsymbol{y} \\
+    \boldsymbol{\Sigma}_{\ast} = \boldsymbol{K}_{\ast\ast} - \boldsymbol{K}_{\ast} \cdot \boldsymbol{V}^{-1} \cdot \boldsymbol{K}_{\ast}^T
+\end{gather*}
+
+MP-GPR utilizes an approximation to the squared exponential kernel:
+\begin{equation}
+  k(\boldsymbol{x},\boldsymbol{x'}) =
+    \begin{cases}
+      \sigma_f^2[\frac{2+cos(2\pi\frac{d}{l})}{3}(1-\frac{d}{l})+\frac{1}{2\pi}sin(2\pi\frac{d}{l})] & \text{if $d < l$}\\
+      0 & \text{if $d \geq l$} 
+    \end{cases}       
+\end{equation}
+
+The log marginal likelihood (LML) is defined as:
+\begin{equation}
+    LML = -\frac{1}{2} \boldsymbol{y}^T \boldsymbol{V}^{-1} \boldsymbol{y} - \frac{1}{2}log|\boldsymbol{V}| - \frac{N}{2}log(2\pi)
+\end{equation}
