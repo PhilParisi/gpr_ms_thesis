@@ -12,7 +12,7 @@ end
 
 
 % load the csv
-data = readtable("exact_100_lml.csv");
+data = readtable("hybrid_50_lml.csv");
 %data = readtable("exact_100_lml.csv");
 % remove rows that have NAN LML
 %to_remove = isnan(data.lml)';
@@ -23,7 +23,6 @@ data = readtable("exact_100_lml.csv");
 fprintf("max lml is %d at length=%d and process=%d \n",lml_max,data.length_scale(ind_max),data.process_noise(ind_max));
 
 
-%%
 % make a scatter plot
 close all
 scatter3(data.length_scale,data.process_noise,data.lml)
