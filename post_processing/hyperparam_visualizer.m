@@ -12,8 +12,8 @@ end
 
 %method = ["random","hybrid","kmeans","neighbor"];
 %percents = 10:10:90;
-method = ["kmeans"];
-percents = ["40_big","30_big","20_big","10_big",10,20,30,40,50,60,70,80,90];
+method = ["neighbor"];
+percents = ["20_big","30_big","10_big",10,20,30,40,50,60,70,80,90];
 
 
 for j = 1:length(method)
