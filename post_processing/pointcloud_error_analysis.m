@@ -24,7 +24,7 @@ end
 exact_name = "exact_100_inference";
 exact_num_pcds = length(dir(fullfile(strcat("../results/PCD/",exact_name,"/block_size_400/predictions"), '*.pcd')));
 
-approx_name = "neighbor_10_inference";
+approx_name = "random_10_inference";
 approx_num_pcds = length(dir(fullfile(strcat("../results/PCD/",approx_name,"/block_size_400/predictions"), '*.pcd')));
 
 
