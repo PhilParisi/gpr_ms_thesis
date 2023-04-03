@@ -1,5 +1,6 @@
 % The Script that Makes all the Error Plots
 % the data below is all from training_hp.xlsx
+% first section only loads the data, following sections make the plots
 
 clc, clearvars, close all
 
@@ -120,4 +121,25 @@ xlim([0 100])
 grid on
 legend('exact','average','systematic','hybrid','neighbor','random','kmeans')
 set(gca,'XDir','reverse')
+hold off
+
+
+%%
+
+figure()
+
+plot(exact.tiletime,exact.RMSE,'ko','markerfacecolor','k'), hold on
+plot(average.tiletime,average.RMSE,'bx-')
+plot(systematic.tiletime,systematic.RMSE,'rv-')
+plot(hybrid.tiletime,hybrid.RMSE,'g^-')
+plot(neighbor.tiletime,neighbor.RMSE,'m*-')
+plot(random.tiletime,random.RMSE,'cs-')
+plot(kmeans.tiletime,kmeans.RMSE,'color', [1 0.5 0], 'marker', '+')
+
+title('RMSE vs. Compute Time')
+xlabel('Mean Processing Time (secs)')
+ylabel('Root Mean Square Error (m)')
+grid on
+legend('exact','average','systematic','hybrid','neighbor','random','kmeans')
+%set(gca,'XDir','reverse')
 hold off

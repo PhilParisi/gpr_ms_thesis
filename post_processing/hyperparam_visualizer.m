@@ -51,12 +51,18 @@ end
 
 %%
 
+clc, clearvars, close all
 
+if ispc()
+    addpath('..\results\LML')
+else
+    addpath('../results/LML/')
+end
 
 
 
 % load the csv
-filename = "random_10_lml";
+filename = "neighbor_90_lml";
 data = readtable(strcat(filename,".csv"));
 %data = readtable("exact_100_lml.csv");
 % remove rows that have NAN LML
@@ -65,7 +71,7 @@ data = data(~to_remove,:);
 data = sortrows(data,'lml','descend');
 
 
-final_ind = round(0.8*length(data.lml));
+final_ind = round(0.95*length(data.lml));
 
 % output the max lml value
 [lml_max, ind_max] = max(data.lml);
@@ -79,3 +85,4 @@ scatter3(data.length_scale(1:final_ind),data.process_noise(1:final_ind),data.lml
 scatter3(data.length_scale(ind_max),data.process_noise(ind_max),lml_max,'ro','filled')
 xlabel('lengthscale'),ylabel('process noise \sigma_f'),zlabel('LML')
 title(filename)
+scatter3(1.25, 0.09167, -89368,'ko','markerfacecolor','k')
