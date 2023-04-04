@@ -1,0 +1,12 @@
+map_frame: utm_local
+cloud_topic: /wassp/detections
+swath_divisions: 4
+viz_rate: 10
+tile/x_dim: 4
+tile/y_dim: 4
+tile/x_margin: 3
+tile/y_margin: 3
+block/size: 400
+length_scale: 4
+process_noise: 0.1
+sensor_var: 0.04
