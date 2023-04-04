@@ -26,6 +26,13 @@ hybrid.MAE = [0.0522, 0.0595, 0.0436, 0.0509, 0.0576, 0.0586, 0.0526, 0.0676, 0.
 hybrid.rawtime = [110.15, 89.53, 73.28, 65.94, 54.77, 43.44, 30.46, 20.50, 10.83]; 
 hybrid.tiletime = [0.372, 0.309, 0.245, 0.227, 0.202, 0.161, 0.110, 0.083, 0.056];
 
+%%%%%% HYBRID DOWNSAMPLE BETTER
+hybridbetter.dsample = [90, 80, 70, 60, 50, 40, 30, 20, 10];
+hybridbetter.RMSE = [0.0543,0.0547,0.0451,0.0535,0.0625,0.0680,0.0746,0.0965,0.1618];
+hybridbetter.MAE = [0.0361,0.0337,0.0290,0.0341,0.0394,0.0388,0.0416,0.0529,0.0903];
+hybridbetter.rawtime = [81.91,72.09,62.03,53.52,42.53,35.61,26.65,18.80,10.52]; 
+hybridbetter.tiletime = [0.238,0.208,0.182,0.156,0.127,0.110,0.085,0.060,0.047];
+
 
 %%%%%% KMEANS DOWNSAMPLE
 kmeans.dsample = [90:-10:10];
@@ -34,6 +41,13 @@ kmeans.MAE = [0.0729,0.0619,0.0632,0.0709,0.0635,0.0565,0.0624,0.0626,0.0939];
 kmeans.rawtime = [150.76,125.29,103.57,82.77,67.30,49.68,35.69,21.34,10.29]; 
 kmeans.tiletime = [0.857,0.712,0.606,0.473,0.391,0.305,0.215,0.133,0.074];
 
+%%%%%% KMEANS DOWNSAMPLE BETTER
+kmeansbetter.dsample = [90:-10:10];
+kmeansbetter.RMSE = [0.0445,0.0754,0.0654,0.0619,0.0647,0.0789,0.0793,0.0972,0.1778];
+kmeansbetter.MAE = [0.0297,0.0478,0.0430,0.0394,0.0413,0.0463,0.0460,0.0553,0.0952];
+kmeansbetter.rawtime = [80.04,71.57,62.14,52.96,44.64,35.65,26.29,19.37,10.41];
+kmeansbetter.tiletime = [0.230,0.208,0.181,0.155,0.132,0.108,0.083,0.061,0.044];
+
 
 %%%%%% NEIGHBOR DOWNSAMPLE
 neighbor.dsample = [90:-10:10];
@@ -41,6 +55,14 @@ neighbor.RMSE = [0.1213,0.1308,0.1219,0.1636,0.1250,0.1348,0.1402,0.1631,0.1979]
 neighbor.MAE = [0.0723,0.0814,0.0749,0.0919,0.0728,0.0828,0.0917,0.1094,0.1376];
 neighbor.rawtime = [158.00,119.32,97.72,72.81,56.88,39.44,27.93,17.03,9.90]; 
 neighbor.tiletime = [0.836,0.645,0.534,0.394,0.320,0.219,0.154,0.101,0.061];
+
+
+%%%%%% NEIGHBOR DOWNSAMPLE BETTER
+neighborbetter.dsample = [90:-10:10];
+neighborbetter.RMSE = [0.0911,0.0575,0.1018,0.0893,0.0771,0.1315,0.1270,0.1676,0.2027];
+neighborbetter.MAE = [0.0554,0.0344,0.0448,0.0528,0.0498,0.0778,0.0757,0.1083,0.1404];
+neighborbetter.rawtime = [89.26,73.14,60.43,51.07,43.10,32.70,25.73,16.44,10.21];
+neighborbetter.tiletime = [0.243,0.213,0.173,0.161,0.126,0.108,0.084,0.099,0.061];
 
 
 %%%%%% SYSTEMATIC DOWNSAMPLE
@@ -69,10 +91,12 @@ mega.neighbor = neighbor;
 mega.random = random;
 mega.systematic = systematic;
 
-disp('results loaded')
+disp('results loaded, for plots run the following sections')
 
 
-%% PLOTS
+%% PLOTS (BETTER METHODS ONLY)
+
+%% PLOTS (OLD VS NEW)
 clc, close all
 
 % Accuracy vs. Time
@@ -82,15 +106,13 @@ clc, close all
 
 % Accuracy vs. Downsample
 figure()
-%for i = 1:6
-    %plot(exact.dsample,exact.RMSE,'ko','markerfacecolor','k'), hold on
-    plot(average.dsample,average.RMSE,'bx-'), hold on
-    plot(systematic.dsample,systematic.RMSE,'rv-')
-    plot(hybrid.dsample,hybrid.RMSE,'g^-')
-    plot(neighbor.dsample,neighbor.RMSE,'m*-')
-    plot(random.dsample,random.RMSE,'cs-')
-    plot(kmeans.dsample,kmeans.RMSE, 'color', [1 0.5 0], 'marker', '+')
-%end
+
+plot(average.dsample,average.RMSE,'bx-'), hold on
+plot(systematic.dsample,systematic.RMSE,'rv-')
+plot(hybridbetter.dsample,hybridbetter.RMSE,'g^-')
+plot(neighborbetter.dsample,neighborbetter.RMSE,'m*-')
+plot(random.dsample,random.RMSE,'cs-')
+plot(kmeansbetter.dsample,kmeansbetter.RMSE, 'color', [1 0.5 0], 'marker', '+','linestyle','-')
 
 title('Error (RMSE) vs. Downsample')
 xlabel('Downsample Percent \it{s}')
@@ -104,15 +126,15 @@ hold off
 % Time vs. Downsample
 
 figure()
-%for i = 1:6
-    plot(exact.dsample,exact.tiletime,'ko','markerfacecolor','k'), hold on 
-    plot(average.dsample,average.tiletime,'bx-')
-    plot(systematic.dsample,systematic.tiletime,'rv-')
-    plot(hybrid.dsample,hybrid.tiletime,'g^-')
-    plot(neighbor.dsample,neighbor.tiletime,'m*-')
-    plot(random.dsample,random.tiletime,'cs-')
-    plot(kmeans.dsample,kmeans.tiletime, 'color', [1 0.5 0], 'marker', '+')
-%end
+
+plot(exact.dsample,exact.tiletime,'ko','markerfacecolor','k'), hold on
+plot(average.dsample,average.tiletime,'bx-')
+plot(systematic.dsample,systematic.tiletime,'rv-')
+plot(hybridbetter.dsample,hybridbetter.tiletime,'g^-')
+plot(neighborbetter.dsample,neighborbetter.tiletime,'m*-')
+plot(random.dsample,random.tiletime,'cs-')
+plot(kmeansbetter.dsample,kmeansbetter.tiletime, 'color', [1 0.5 0], 'marker', '+','linestyle','-')
+
 
 title('Mean Processing Time vs. Downsample')
 xlabel('Downsample Percent \it{s}')
@@ -123,23 +145,107 @@ legend('exact','average','systematic','hybrid','neighbor','random','kmeans')
 set(gca,'XDir','reverse')
 hold off
 
+disp('graphs with the updated kmeans neighbor and hybrid only')
 
-%%
 
+% Combined Axis graph (RMSE vs. Time)
 figure()
 
 plot(exact.tiletime,exact.RMSE,'ko','markerfacecolor','k'), hold on
 plot(average.tiletime,average.RMSE,'bx-')
 plot(systematic.tiletime,systematic.RMSE,'rv-')
-plot(hybrid.tiletime,hybrid.RMSE,'g^-')
-plot(neighbor.tiletime,neighbor.RMSE,'m*-')
+plot(hybridbetter.tiletime,hybridbetter.RMSE,'g^-')
+plot(neighborbetter.tiletime,neighborbetter.RMSE,'m*-')
 plot(random.tiletime,random.RMSE,'cs-')
-plot(kmeans.tiletime,kmeans.RMSE,'color', [1 0.5 0], 'marker', '+')
+plot(kmeansbetter.tiletime,kmeansbetter.RMSE,'color', [1 0.5 0], 'marker', '+','linestyle','-')
 
 title('RMSE vs. Compute Time')
 xlabel('Mean Processing Time (secs)')
 ylabel('Root Mean Square Error (m)')
 grid on
 legend('exact','average','systematic','hybrid','neighbor','random','kmeans')
+%set(gca,'XDir','reverse')
+hold off
+
+
+%% PLOTS (OLD VS NEW)
+clc, close all
+
+% Accuracy vs. Time
+%figure()
+
+
+
+% Accuracy vs. Downsample
+figure()
+
+%plot(exact.dsample,exact.RMSE,'ko','markerfacecolor','k'), hold on
+plot(average.dsample,average.RMSE,'bx-'), hold on
+
+plot(systematic.dsample,systematic.RMSE,'rv-')
+plot(hybrid.dsample,hybrid.RMSE,'g^--')
+plot(hybridbetter.dsample,hybridbetter.RMSE,'g^-')
+plot(neighbor.dsample,neighbor.RMSE,'m+--')
+plot(neighborbetter.dsample,neighborbetter.RMSE,'m*-')
+plot(random.dsample,random.RMSE,'cs-')
+plot(kmeans.dsample,kmeans.RMSE, 'color', [1 0.5 0], 'marker', '+','linestyle','--')
+plot(kmeansbetter.dsample,kmeansbetter.RMSE, 'color', [1 0.5 0], 'marker', '+','linestyle','-')
+
+title('Error (RMSE) vs. Downsample')
+xlabel('Downsample Percent \it{s}')
+ylabel('Root Mean Square Error (m)')
+grid on
+xlim([0 100])
+legend('average','systematic','hybrid','hybridbetter','neighbor','neighborbetter','random','kmeans','kmeansbetter','location','northwest')
+set(gca,'XDir','reverse')
+hold off
+
+% Time vs. Downsample
+
+figure()
+
+plot(exact.dsample,exact.tiletime,'ko','markerfacecolor','k'), hold on
+plot(average.dsample,average.tiletime,'bx-')
+plot(systematic.dsample,systematic.tiletime,'rv-')
+plot(hybrid.dsample,hybrid.tiletime,'g^--')
+plot(hybridbetter.dsample,hybridbetter.tiletime,'g^-')
+plot(neighbor.dsample,neighbor.tiletime,'m*--')
+plot(neighborbetter.dsample,neighborbetter.tiletime,'m*-')
+plot(random.dsample,random.tiletime,'cs-')
+plot(kmeans.dsample,kmeans.tiletime, 'color', [1 0.5 0], 'marker', '+','linestyle','--')
+plot(kmeansbetter.dsample,kmeansbetter.tiletime, 'color', [1 0.5 0], 'marker', '+','linestyle','-')
+
+
+title('Mean Processing Time vs. Downsample')
+xlabel('Downsample Percent \it{s}')
+ylabel('Mean Processing Time (secs)')
+xlim([0 100])
+grid on
+legend('exact','average','systematic','hybrid','hybridbetter','neighbor','neighborbetter','random','kmeans','kmeansbetter')
+set(gca,'XDir','reverse')
+hold off
+
+disp('graphs comparing the old and better for kmeans, neighbor, and hybrid')
+
+
+% Combined Axis graph (RMSE vs. Time)
+figure()
+
+plot(exact.tiletime,exact.RMSE,'ko','markerfacecolor','k'), hold on
+plot(average.tiletime,average.RMSE,'bx-')
+plot(systematic.tiletime,systematic.RMSE,'rv-')
+plot(hybrid.tiletime,hybrid.RMSE,'g^--')
+plot(hybridbetter.tiletime,hybridbetter.RMSE,'g^-')
+plot(neighbor.tiletime,neighbor.RMSE,'m*--')
+plot(neighborbetter.tiletime,neighborbetter.RMSE,'m*-')
+plot(random.tiletime,random.RMSE,'cs-')
+plot(kmeans.tiletime,kmeans.RMSE,'color', [1 0.5 0], 'marker', '+','linestyle','--')
+plot(kmeansbetter.tiletime,kmeansbetter.RMSE,'color', [1 0.5 0], 'marker', '+','linestyle','-')
+
+title('RMSE vs. Compute Time')
+xlabel('Mean Processing Time (secs)')
+ylabel('Root Mean Square Error (m)')
+grid on
+legend('exact','average','systematic','hybrid','hybridbetter','neighbor','neighborbetter','random','kmeans','kmeansbetter')
 %set(gca,'XDir','reverse')
 hold off
