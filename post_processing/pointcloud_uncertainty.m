@@ -18,7 +18,7 @@ end
 
 
 % basic stats about the pointcloud
-exact_name = "exact_100_inference";
+exact_name = "neighbor_20_inference_better"; % CHANGE THIS
 exact_num_pcds = length(dir(fullfile(strcat("..\results\PCD\",exact_name,"\block_size_400\predictions"), '*.pcd')));
 exact_pcd = [];
 
@@ -29,8 +29,10 @@ for i = 0:(exact_num_pcds-1)
     exact_pcd = [exact_pcd; exact_temp];
 end
 
-%% plot the uncertainties
+disp('pcd loaded')
 
+%% plot the uncertainties [used to make the uncertplots in graphics]
+clc, close all
 
 % Define the colormap you want to use
 cmap = jet(256); % for example, using the jet colormap with 256 levels
@@ -44,12 +46,13 @@ scatter(exact_pcd(:,1), ...
 % Add a colorbar to the plot
 colormap(cmap);
 c = colorbar;
-c.Label.String = 'Uncertainty';
+c.Label.String = 'uncertainty \sigma^2';
+c.Label.FontSize = 11;
 
 % Adjust the figure layout
 axis equal
-xlabel('x')
-ylabel('y')
+xlabel('x position (m)')
+ylabel('y position (m)')
 
 %%
 
